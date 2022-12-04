@@ -26,8 +26,6 @@ Author: Wooseok Diaa Hwang - 황우석
 
 ## Code
 
-DataSheet와 함께 코드를 열심히 분석 중...
-
 ```C
 #define MAX_LED 10  // LED 개수를 미리 전처리기로 정의해준다.
 #define USE_BRIGHTNESS 1  // 밝기 설정 On/Off 스위치이다. 0 - False, 1 - True
