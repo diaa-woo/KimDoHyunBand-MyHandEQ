@@ -25,14 +25,16 @@ Author: Wooseok Diaa Hwang - 황우석
       - data width - peripheral: Half Word
 
 ## Code
+
 ```C
-/* USER CODE BEGIN 0 */
-#define MAX_LED 10
-#define USE_BRIGHTNESS 1
+#define MAX_LED 10  // LED 개수를 미리 전처리기로 정의해준다.
+#define USE_BRIGHTNESS 1  // 밝기 설정 On/Off 스위치이다. 0 - False, 1 - True
 
 uint8_t LED_Data[MAX_LED][4];
 uint8_t LED_Mod[MAX_LED][4];
+```
 
+```C
 void setLED(int ledNum, int red, int green, int blue) {
 	LED_Data[ledNum][0] = ledNum;
 	LED_Data[ledNum][1] = green;
