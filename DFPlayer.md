@@ -12,7 +12,9 @@ DFPlayer로 음악을 출력해내는 코드이다.
 
 - 클럭: HSE, 72Mhz
 - 사용 핀
-  - PA8: TIM1 Channel1 PWM Generator
+  - PA7: name: BTN1; GPIO_EXTI7; No pull up and pull down
+  - PA9: name: BTN2; GPIO_EXTI9; No pull up and pull down
+  - PA8: name: BTN3; GPIO_EXTI8; No pull up and pull down
 - USART1 setting
   - pin: PB10, PB11
   - Async
@@ -23,7 +25,15 @@ DFPlayer로 음악을 출력해내는 코드이다.
 DFPlayerLibrary.c
 
 ```C
+/*
+ * DFPlayerLibrary.c
+ *
+ *  Created on: Dec 12, 2022
+ *      Author: diadntjr
+ */
+
 #include "stm32f1xx_hal.h"
+#include "DFPlayerLibrary.h"
 #include "stdio.h"
 
 extern UART_HandleTypeDef huart3;
@@ -65,21 +75,91 @@ void init_DF(uint8_t volume)  // volume: 0 - 30
 	sendCMD(0x06, 0x00, volume);
 	HAL_Delay(500);
 }
+
+void next_DF() {
+	sendCMD(0x01, 0x00, 0x00);
+	HAL_Delay(200);
+}
+
+void playback_DF() {
+	sendCMD(0x0D, 0, 0);
+	HAL_Delay(200);
+}
+
+void pause_DF() {
+	sendCMD(0x0E, 0, 0);
+	HAL_Delay(200);
+}
+
+void previous_DF() {
+	sendCMD(0x02, 0, 0);
+	HAL_Delay(200);
+}
+
+void runMode() {
+	switch(DF_MODE) {
+	case NEXT:
+		next_DF();
+		DF_MODE = NONE;
+		break;
+	case TOGGLE:
+		if(isplaying)
+		{
+			ispause = 1;
+			isplaying = 0;
+			pause_DF();
+		}
+		else if(ispause)
+		{
+			isplaying = 1;
+			ispause = 0;
+			playback_DF();
+		}
+		DF_MODE = NONE;
+		break;
+	case PREVIOUS:
+		previous_DF();
+		DF_MODE = NONE;
+		break;
+	case NONE:
+		break;
+	}
+}
+
 ```
 
 DFPlayerLibrary.h
 
 ```C
+/*
+ * DFPlayerLibrary.h
+ *
+ *  Created on: Dec 12, 2022
+ *      Author: diadntjr
+ */
+
 #ifndef INC_DFPLAYERLIBRARY_H_
 #define INC_DFPLAYERLIBRARY_H_
 
 void sendCMD(uint8_t cmd, uint8_t parameter1, uint8_t parameter2);
 void playTrack_DF(uint8_t trackNum);
 void init_DF(uint8_t volume);
+void next_DF();
+void pause_DF();
+void playback_DF();
+void previous_DF();
+void runMode();
 
+typedef enum mode{
+	NONE,
+	NEXT,
+	TOGGLE,
+	PREVIOUS
+}MODE;
+
+extern MODE DF_MODE;
 
 #endif /* INC_DFPLAYERLIBRARY_H_ */
-
 ```
 
 main 함수
@@ -112,7 +192,7 @@ int main(void)
   MX_USART2_UART_Init();
   MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
-  init_DF(20);  // control volume
+  init_DF(14);  // control volume
   playTrack_DF(0x02);  // music order
   /* USER CODE END 2 */
 
@@ -120,6 +200,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  runMode();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
