@@ -162,6 +162,24 @@ extern MODE DF_MODE;
 #endif /* INC_DFPLAYERLIBRARY_H_ */
 ```
 
+main.c | Private User Code
+
+```C
+MODE DF_MODE;
+
+void HAL_GPIO_EXTI_Callback(uint16_t pin) {
+	if(pin == BTN1_Pin) {
+		DF_MODE = PREVIOUS;
+	}
+	if(pin == BTN2_Pin) {
+		DF_MODE = TOGGLE;
+	}
+	if(pin == BTN3_Pin) {
+		DF_MODE = NEXT;
+	}
+}
+```
+
 main 함수
 
 ```C
