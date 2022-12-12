@@ -11,7 +11,7 @@ DFPlayer로 음악을 출력해내는 코드이다.
 **Nucleo-F103RB**
 
 - 클럭: HSE, 72Mhz
-- 사용 핀
+- GPIO & EXTI
   - PA7: name: BTN1; GPIO_EXTI7; No pull up and pull down
   - PA9: name: BTN2; GPIO_EXTI9; No pull up and pull down
   - PA8: name: BTN3; GPIO_EXTI8; No pull up and pull down
