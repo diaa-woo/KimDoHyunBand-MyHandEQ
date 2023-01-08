@@ -32,18 +32,31 @@ MSGEQ7Library.c
 #include "main.h"
 #include "stm32f1xx_hal.h"
 
-uint32_t spectrumValues[7];
+int spectrumValues[7];
+
+extern ADC_HandleTypeDef hadc1;
+extern TIM_HandleTypeDef htim1;
+
+/*__weak */ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+	if(htim->Instance == &htim1) {
+		HAL_GPIO_TogglePin(STROBE_GPIO_Port, STROBE_Pin);
+	}
+
+}
 
 void poll() {
+	HAL_GPIO_WritePin(STROBE_GPIO_Port, STROBE_Pin, RESET);
 	HAL_GPIO_WritePin(RESET_GPIO_Port, RESET_Pin, SET);
 	HAL_GPIO_WritePin(RESET_GPIO_Port, RESET_Pin, RESET);
+	HAL_TIM_Base_Start_IT(&htim1);
 
 	for(int i = 0; i < 7; i++) {
-		HAL_GPIO_WritePin(STROBE_GPIO_Port, STROBE_Pin, RESET);
-		delay_us(36);
-
+		HAL_ADC_PollForConversion(&hadc1, 1);
+		spectrumValues[i] = (int)HAL_ADC_GetValue(&hadc1);
 	}
 }
+
 ```
 
 MSGEQ7Library.h
